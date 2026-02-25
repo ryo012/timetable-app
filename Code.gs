@@ -1,21 +1,38 @@
 // ============================================================
 //  時間割マネージャー - GAS バックエンド (REST API対応版)
-//  【変更点】doPost() を追加。GitHub PagesのURLからのfetchリクエストを受け付ける。
+//  【変更点】doGet() でも payload パラメータ経由のAPIリクエストを処理。
+//           GASへのPOSTは302リダイレクトでbodyが失われるため
+//           フロントからはGET+payloadパラメータで送信する。
 //  【設定】デプロイ時は「アクセス：全員（匿名を含む）」を選択すること。
 // ============================================================
 
-// HTMLとして提供する場合（GAS Webアプリとしても残す）
-function doGet() {
+function doGet(e) {
+  // payload パラメータがある場合はAPIリクエストとして処理
+  if (e && e.parameter && e.parameter.payload) {
+    return handleApiRequest(JSON.parse(e.parameter.payload));
+  }
+  // 通常アクセス: HTMLを返す（GAS Webアプリとしても使える）
   return HtmlService.createTemplateFromFile('index')
     .evaluate()
     .setTitle('時間割マネージャー')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1');
 }
 
-// ★ 追加：REST APIエンドポイント（GitHub Pagesフロントからのfetchリクエストをここで受け取る）
+// POST も念のため残す（直接POSTできる環境向け）
 function doPost(e) {
   try {
     const params = JSON.parse(e.postData.contents);
+    return handleApiRequest(params);
+  } catch (err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ error: err.message }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+// ★ API処理の共通ハンドラ
+function handleApiRequest(params) {
+  try {
     const action = params.action;
     let result;
 
@@ -38,7 +55,6 @@ function doPost(e) {
     return ContentService
       .createTextOutput(JSON.stringify(result))
       .setMimeType(ContentService.MimeType.JSON);
-
   } catch (err) {
     return ContentService
       .createTextOutput(JSON.stringify({ error: err.message }))
@@ -46,11 +62,12 @@ function doPost(e) {
   }
 }
 
-// ★ doPost のテスト用関数（GASエディタで直接実行して動作確認できる）
-function testDoPost() {
-  const e = { postData: { contents: JSON.stringify({ action: 'loadData', key: 'settings' }) } };
-  Logger.log(doPost(e).getContent());
+// ★ テスト用
+function testDoGet() {
+  const e = { parameter: { payload: JSON.stringify({ action: 'loadData', key: 'settings' }) } };
+  Logger.log(doGet(e).getContent());
 }
+
 
 // ============================================================
 //  以下は元のコードをそのままコピーしてください

@@ -490,7 +490,7 @@
       //   GASエディタ → デプロイ → Webアプリとして導入 → URLをコピー
       //   例: 'https://script.google.com/macros/s/AKfycb.../exec'
       // ============================================================
-      const GAS_URL = 'https://script.google.com/macros/s/AKfycbyw4lRM-e4UvSs3N-djyPFLsUFYnwlbQmTZMWG4vAzrRwX2WCXiwn61hYwuHUcRFKO9Ew/exec';
+      const GAS_URL = 'https://script.google.com/macros/s/AKfycby203cW5tBogSG83y3FjNAoroz2tnkBsGucq-u273XmHEUSJldyeilub5uMlsZGxYg1lw/exec';
 
       // args配列をfetch用のリクエストボディに変換するヘルパー
       const buildFetchBody = (funcName, args) => {
@@ -506,9 +506,12 @@
       const runGAS = (funcName, args, onSuccess, onFailure) => {
         // --- GitHub Pages + GAS REST API モード ---
         if (GAS_URL) {
-          fetch(GAS_URL, {
-            method: 'POST',
-            body: JSON.stringify(buildFetchBody(funcName, args)),
+          // ★ GASへのPOSTは302リダイレクト時にGETに変換されbodyが失われるため
+          //   GET + payload URLパラメータ方式で送信する
+          const payload = encodeURIComponent(JSON.stringify(buildFetchBody(funcName, args)));
+          fetch(`${GAS_URL}?payload=${payload}`, {
+            method: 'GET',
+            redirect: 'follow',
           })
             .then(res => {
               if (!res.ok) throw new Error(`HTTP error: ${res.status}`);

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <base target="_top">
   <!-- React & Babel -->
@@ -10,19 +11,54 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     /* ローディングアニメーション */
-    .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #3498db;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
     /* スクロールバー調整 */
-    ::-webkit-scrollbar { width: 8px; height: 8px; }
-    ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #ccc;
+      border-radius: 4px;
+    }
+
     /* Inputのプレースホルダー色調整 */
-    ::placeholder { color: rgba(0,0,0,0.2); }
+    ::placeholder {
+      color: rgba(0, 0, 0, 0.2);
+    }
+
     /* 横スクロールのスナップ */
-    .snap-x { scroll-snap-type: x mandatory; }
-    .snap-center { scroll-snap-align: center; }
+    .snap-x {
+      scroll-snap-type: x mandatory;
+    }
+
+    .snap-center {
+      scroll-snap-align: center;
+    }
 
     /* 全体を少し縮小して見渡しやすくする */
-    #root { zoom: 0.9; }
+    #root {
+      zoom: 0.9;
+    }
 
     /* 斜線パターン（なしの場合） */
     .diagonal-stripe {
@@ -37,6 +73,7 @@
         size: A4 landscape;
         margin: 5mm;
       }
+
       body {
         background-color: white !important;
         -webkit-print-color-adjust: exact !important;
@@ -44,8 +81,14 @@
         margin: 0;
         padding: 0;
       }
-      
-      .no-print, header, nav, button, .toast, .modal-overlay, .controls-area {
+
+      .no-print,
+      header,
+      nav,
+      button,
+      .toast,
+      .modal-overlay,
+      .controls-area {
         display: none !important;
       }
 
@@ -63,13 +106,13 @@
         width: 100% !important;
         padding: 0 !important;
       }
-      
+
       .print-scroll-view {
         min-width: 0 !important;
         padding: 0 !important;
         display: block !important;
       }
-      
+
       .grid {
         display: grid !important;
         width: 100% !important;
@@ -78,7 +121,7 @@
         border-left: 2px solid #333;
       }
 
-      .grid > div {
+      .grid>div {
         border-right: 1px solid #333;
         border-bottom: 1px solid #333;
         background-color: white !important;
@@ -100,7 +143,7 @@
         height: 24mm !important;
         padding: 0 !important;
       }
-      
+
       .print-break-cell {
         height: 5mm !important;
         font-size: 8px !important;
@@ -113,12 +156,15 @@
         background-color: #f9fafb !important;
         justify-content: center;
       }
+
       .print-time-col span {
         font-size: 10px !important;
       }
+
       .print-time-col .text-xl {
         font-size: 14px !important;
       }
+
       .print-time-col .text-xs {
         display: none !important;
       }
@@ -128,7 +174,10 @@
         border-right: 1px solid #333;
         border-bottom: 1px solid #333;
       }
-      .print-diagonal div { display: none; }
+
+      .print-diagonal div {
+        display: none;
+      }
 
       input {
         font-size: 12px !important;
@@ -136,12 +185,14 @@
         border: none !important;
         padding: 0 !important;
       }
+
       input[placeholder=""] {
-        font-size: 14px !important; 
+        font-size: 14px !important;
         font-weight: bold !important;
         height: 60% !important;
         align-self: center;
       }
+
       input[placeholder="内容"] {
         font-size: 10px !important;
         height: 40% !important;
@@ -156,22 +207,25 @@
         padding: 0 5mm;
         height: 15mm;
       }
+
       .print-header-area h1 {
         font-size: 18px;
         font-weight: bold;
         margin: 0;
       }
+
       .print-header-area p {
         font-size: 12px;
         margin: 0;
       }
     }
-    
+
     .print-header-area {
       display: none;
     }
   </style>
 </head>
+
 <body class="bg-gray-50 text-gray-900">
   <div id="root"></div>
 
@@ -217,7 +271,7 @@
     ];
 
     const CLASS_COUNT = 6;
-    
+
     // ★ 基準時数データ
     const STANDARD_HOURS = {
       '1': { '国語': 306, '社会': 0, '算数': 136, '理科': 0, '生活': 102, '音楽': 68, '図画工作': 68, '家庭': 0, '体育': 102, '特別の教科 道徳': 34, '特別活動': 34, '総合的な学習の時間': 0, '外国語活動': 0, '外国語': 0 },
@@ -227,12 +281,12 @@
       '5': { '国語': 175, '社会': 100, '算数': 175, '理科': 105, '生活': 0, '音楽': 50, '図画工作': 50, '家庭': 60, '体育': 90, '特別の教科 道徳': 35, '特別活動': 35, '総合的な学習の時間': 70, '外国語活動': 0, '外国語': 70 },
       '6': { '国語': 175, '社会': 105, '算数': 175, '理科': 105, '生活': 0, '音楽': 50, '図画工作': 50, '家庭': 55, '体育': 90, '特別の教科 道徳': 35, '特別活動': 35, '総合的な学習の時間': 70, '外国語活動': 0, '外国語': 70 }
     };
-    
+
     // ★ 科目名の正規化関数
     const normalizeSubject = (input, grade) => {
       if (!input) return '';
       const s = input.trim();
-      
+
       if (s === '国' || s === '国語') return '国語';
       if (s === '社' || s === '社会') return '社会';
       if (s === '算' || s === '算数') return '算数';
@@ -250,10 +304,10 @@
         if (grade === '5' || grade === '6') return '外国語';
         return '外国語';
       }
-      
+
       return s;
     };
-    
+
     const EMPTY_SCHEDULE = {
       '月': { classes: Array(CLASS_COUNT).fill({ subject: '', detail: '' }), memo: '', breaks: { lunch: true, noon_break: true, cleaning: true } },
       '火': { classes: Array(CLASS_COUNT).fill({ subject: '', detail: '' }), memo: '', breaks: { lunch: true, noon_break: true, cleaning: true } },
@@ -261,7 +315,7 @@
       '木': { classes: Array(CLASS_COUNT).fill({ subject: '', detail: '' }), memo: '', breaks: { lunch: true, noon_break: true, cleaning: true } },
       '金': { classes: Array(CLASS_COUNT).fill({ subject: '', detail: '' }), memo: '', breaks: { lunch: true, noon_break: true, cleaning: true } }
     };
-    
+
     const SUBJECT_COLORS = {
       '国語': 'bg-red-100 text-red-800 border-red-200', '算数': 'bg-blue-100 text-blue-800 border-blue-200',
       '理科': 'bg-green-100 text-green-800 border-green-200', '社会': 'bg-yellow-100 text-yellow-800 border-yellow-200',
@@ -272,30 +326,30 @@
     };
 
     const Icons = {
-      BookOpen: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>,
-      ArrowLeft: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>,
-      ArrowRight: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>,
-      Eraser: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"/><path d="M22 21H7"/><path d="m5 11 9 9"/></svg>,
-      Copy: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>,
-      Save: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>,
-      Settings: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>,
-      CloudUpload: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M12 12v9"/><path d="m16 16-4-4-4 4"/></svg>,
-      Undo: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>,
-      Redo: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3L21 13"/></svg>,
-      CheckCircle2: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>,
-      Printer: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>,
-      AlertTriangle: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>,
-      Calculator: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/></svg>,
-      Download: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>,
+      BookOpen: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" /><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" /></svg>,
+      ArrowLeft: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m12 19-7-7 7-7" /><path d="M19 12H5" /></svg>,
+      ArrowRight: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg>,
+      Eraser: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21" /><path d="M22 21H7" /><path d="m5 11 9 9" /></svg>,
+      Copy: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2" /><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" /></svg>,
+      Save: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" /><polyline points="17 21 17 13 7 13 7 21" /><polyline points="7 3 7 8 15 8" /></svg>,
+      Settings: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" /></svg>,
+      CloudUpload: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242" /><path d="M12 12v9" /><path d="m16 16-4-4-4 4" /></svg>,
+      Undo: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 7v6h6" /><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13" /></svg>,
+      Redo: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 7v6h-6" /><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3L21 13" /></svg>,
+      CheckCircle2: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="m9 12 2 2 4-4" /></svg>,
+      Printer: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 6 2 18 2 18 9" /><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" /><rect width="12" height="8" x="6" y="14" /></svg>,
+      AlertTriangle: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" /><path d="M12 9v4" /><path d="M12 17h.01" /></svg>,
+      Calculator: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect width="16" height="20" x="4" y="2" rx="2" /><line x1="8" x2="16" y1="6" y2="6" /><line x1="16" x2="16" y1="14" y2="18" /><path d="M16 10h.01" /><path d="M12 10h.01" /><path d="M8 10h.01" /><path d="M12 14h.01" /><path d="M8 14h.01" /><path d="M12 18h.01" /><path d="M8 18h.01" /></svg>,
+      Download: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" x2="12" y1="15" y2="3" /></svg>,
     };
 
     const getSchoolWeekNumber = (date, startDate) => {
       if (!startDate) return 1;
-      const d = new Date(date); d.setHours(0,0,0,0);
+      const d = new Date(date); d.setHours(0, 0, 0, 0);
       const day = d.getDay(); const diffToMon = d.getDate() - day + (day === 0 ? -6 : 1);
       const targetMonday = new Date(d.setDate(diffToMon));
       const sMon = new Date(startDate); const sDay = sMon.getDay(); const diffS = sMon.getDate() - sDay + (sDay === 0 ? -6 : 1);
-      const baseMonday = new Date(sMon.setDate(diffS)); baseMonday.setHours(0,0,0,0);
+      const baseMonday = new Date(sMon.setDate(diffS)); baseMonday.setHours(0, 0, 0, 0);
       return Math.floor((targetMonday.getTime() - baseMonday.getTime()) / (1000 * 60 * 60 * 24 * 7)) + 1;
     };
     const getWeekId = (date, startDate) => `SY${startDate.getFullYear()}-W${('00' + getSchoolWeekNumber(date, startDate)).slice(-2)}`;
@@ -312,7 +366,7 @@
 
     const getWeekDates = (baseMonday) => {
       const dates = [];
-      for(let i=0; i<5; i++){
+      for (let i = 0; i < 5; i++) {
         const d = new Date(baseMonday);
         d.setDate(baseMonday.getDate() + i);
         dates.push({
@@ -328,7 +382,7 @@
       for (const key in SUBJECT_COLORS) { if (subject.includes(key)) return SUBJECT_COLORS[key]; }
       return 'bg-white border-gray-200 text-gray-700';
     };
-    
+
     const getTimeForCell = (day, rowId, variableTime, defaultTime) => {
       if (!variableTime) return defaultTime;
       const config = DAY_CONFIG[day];
@@ -337,16 +391,16 @@
     };
 
     const parseTimeRange = (dateStr, timeRangeStr) => {
-        if (!timeRangeStr) return null;
-        const [startStr, endStr] = timeRangeStr.split('-');
-        if (!startStr || !endStr) return null;
-        const parseTime = (tStr) => {
-            const [h, m] = tStr.split(':').map(Number);
-            const d = new Date(dateStr);
-            d.setHours(h, m, 0, 0);
-            return d;
-        };
-        return { start: parseTime(startStr), end: parseTime(endStr) };
+      if (!timeRangeStr) return null;
+      const [startStr, endStr] = timeRangeStr.split('-');
+      if (!startStr || !endStr) return null;
+      const parseTime = (tStr) => {
+        const [h, m] = tStr.split(':').map(Number);
+        const d = new Date(dateStr);
+        d.setHours(h, m, 0, 0);
+        return d;
+      };
+      return { start: parseTime(startStr), end: parseTime(endStr) };
     };
 
     const migrateData = (data) => {
@@ -357,16 +411,16 @@
           newData[d] = JSON.parse(JSON.stringify(EMPTY_SCHEDULE['月']));
         } else {
           if (Array.isArray(newData[d])) {
-             const cls = newData[d].map(item => (typeof item === 'string' ? { subject: item, detail: '' } : item || { subject: '', detail: '' }));
-             while(cls.length < CLASS_COUNT) cls.push({ subject: '', detail: '' });
-             newData[d] = { classes: cls, memo: '', breaks: { lunch: true, noon_break: true, cleaning: true } };
+            const cls = newData[d].map(item => (typeof item === 'string' ? { subject: item, detail: '' } : item || { subject: '', detail: '' }));
+            while (cls.length < CLASS_COUNT) cls.push({ subject: '', detail: '' });
+            newData[d] = { classes: cls, memo: '', breaks: { lunch: true, noon_break: true, cleaning: true } };
           } else {
-             if (!newData[d].classes) newData[d].classes = Array(CLASS_COUNT).fill({ subject: '', detail: '' });
-             if (typeof newData[d].memo === 'undefined') newData[d].memo = '';
-             if (!newData[d].breaks) newData[d].breaks = { lunch: true, noon_break: true, cleaning: true };
-             
-             newData[d].classes = newData[d].classes.map(item => (typeof item === 'string' ? { subject: item, detail: '' } : item || { subject: '', detail: '' }));
-             while(newData[d].classes.length < CLASS_COUNT) newData[d].classes.push({ subject: '', detail: '' });
+            if (!newData[d].classes) newData[d].classes = Array(CLASS_COUNT).fill({ subject: '', detail: '' });
+            if (typeof newData[d].memo === 'undefined') newData[d].memo = '';
+            if (!newData[d].breaks) newData[d].breaks = { lunch: true, noon_break: true, cleaning: true };
+
+            newData[d].classes = newData[d].classes.map(item => (typeof item === 'string' ? { subject: item, detail: '' } : item || { subject: '', detail: '' }));
+            while (newData[d].classes.length < CLASS_COUNT) newData[d].classes.push({ subject: '', detail: '' });
           }
         }
       });
@@ -379,10 +433,10 @@
       for (let i = 0; i < 53; i++) {
         const weekStart = new Date(start);
         weekStart.setDate(start.getDate() + (i * 7));
-        
+
         const weekEnd = new Date(weekStart);
         weekEnd.setDate(weekStart.getDate() + 4);
-        
+
         weeks.push({
           no: i + 1,
           start: weekStart,
@@ -412,11 +466,11 @@
       const [assignedGrade, setAssignedGrade] = useState('5'); // ★ 担当学年
       const [calendarId, setCalendarId] = useState(''); // ★ カレンダーID
       const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-      
+
       const [masterDataA, setMasterDataA] = useState(null);
       const [masterDataB, setMasterDataB] = useState(null);
       const [weeklyData, setWeeklyData] = useState(null);
-      
+
       const [loading, setLoading] = useState(true);
       const [saving, setSaving] = useState(false);
       const [notification, setNotification] = useState(null);
@@ -436,15 +490,15 @@
       //   GASエディタ → デプロイ → Webアプリとして導入 → URLをコピー
       //   例: 'https://script.google.com/macros/s/AKfycb.../exec'
       // ============================================================
-      const GAS_URL = '';
+      const GAS_URL = 'https://script.google.com/macros/s/AKfycbwjLY0BYJMNqFKi4Grd5PFLzMkTXgVpA45l0-zD1v6RvOvl1zChZ8HRO3SFTk4Zh6ueMQ/exec';
 
       // args配列をfetch用のリクエストボディに変換するヘルパー
       const buildFetchBody = (funcName, args) => {
         if (funcName === 'getInitialData') return { action: funcName, date: args[0] };
-        if (funcName === 'loadData')       return { action: funcName, key: args[0] };
-        if (funcName === 'saveData')       return { action: funcName, key: args[0], data: args[1] };
-        if (funcName === 'getYearlyData')  return { action: funcName, prefix: args[0] };
-        if (funcName === 'saveSettings')   return { action: funcName, settings: args[0] };
+        if (funcName === 'loadData') return { action: funcName, key: args[0] };
+        if (funcName === 'saveData') return { action: funcName, key: args[0], data: args[1] };
+        if (funcName === 'getYearlyData') return { action: funcName, prefix: args[0] };
+        if (funcName === 'saveSettings') return { action: funcName, settings: args[0] };
         if (funcName === 'getCalendarEventsForWeek') return { action: funcName, calendarId: args[0], monday: args[1] };
         return { action: funcName };
       };
@@ -456,22 +510,22 @@
             method: 'POST',
             body: JSON.stringify(buildFetchBody(funcName, args)),
           })
-          .then(res => {
-            if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
-            return res.json();
-          })
-          .then(data => {
-            if (data && data.error) {
-              if (onFailure) onFailure(new Error(data.error));
-              else console.error('[GAS Error]', data.error);
-            } else {
-              onSuccess(data);
-            }
-          })
-          .catch(err => {
-            console.error('[Fetch Error]', err);
-            if (onFailure) onFailure(err);
-          });
+            .then(res => {
+              if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+              return res.json();
+            })
+            .then(data => {
+              if (data && data.error) {
+                if (onFailure) onFailure(new Error(data.error));
+                else console.error('[GAS Error]', data.error);
+              } else {
+                onSuccess(data);
+              }
+            })
+            .catch(err => {
+              console.error('[Fetch Error]', err);
+              if (onFailure) onFailure(err);
+            });
           return;
         }
 
@@ -479,72 +533,72 @@
         console.log(`[Preview] Calling ${funcName}`, args);
         setTimeout(() => {
           if (funcName === 'getInitialData') {
-              const settingsStr = localStorage.getItem('timetable_settings');
-              const settings = settingsStr ? JSON.parse(settingsStr) : null;
-              const masterA = localStorage.getItem('timetable_masterA');
-              const masterB = localStorage.getItem('timetable_masterB');
-              const master = localStorage.getItem('timetable_master');
-              const weekId = 'SY2026-W01';
-              const currentWeek = localStorage.getItem('timetable_' + weekId);
-              onSuccess({
-                  settings: settings,
-                  master: master ? JSON.parse(master) : null,
-                  masterA: masterA ? JSON.parse(masterA) : null,
-                  masterB: masterB ? JSON.parse(masterB) : null,
-                  currentWeek: currentWeek ? JSON.parse(currentWeek) : null,
-                  weekId: weekId
-              });
+            const settingsStr = localStorage.getItem('timetable_settings');
+            const settings = settingsStr ? JSON.parse(settingsStr) : null;
+            const masterA = localStorage.getItem('timetable_masterA');
+            const masterB = localStorage.getItem('timetable_masterB');
+            const master = localStorage.getItem('timetable_master');
+            const weekId = 'SY2026-W01';
+            const currentWeek = localStorage.getItem('timetable_' + weekId);
+            onSuccess({
+              settings: settings,
+              master: master ? JSON.parse(master) : null,
+              masterA: masterA ? JSON.parse(masterA) : null,
+              masterB: masterB ? JSON.parse(masterB) : null,
+              currentWeek: currentWeek ? JSON.parse(currentWeek) : null,
+              weekId: weekId
+            });
           } else if (funcName === 'loadData') {
-              const saved = localStorage.getItem('timetable_' + args[0]);
-              onSuccess(saved ? JSON.parse(saved) : null);
+            const saved = localStorage.getItem('timetable_' + args[0]);
+            onSuccess(saved ? JSON.parse(saved) : null);
           } else if (funcName === 'saveData') {
-              localStorage.setItem('timetable_' + args[0], JSON.stringify(args[1]));
-              onSuccess({ success: true });
+            localStorage.setItem('timetable_' + args[0], JSON.stringify(args[1]));
+            onSuccess({ success: true });
           } else if (funcName === 'loadSettings') {
-              const saved = localStorage.getItem('timetable_settings');
-              onSuccess(saved ? JSON.parse(saved) : null);
+            const saved = localStorage.getItem('timetable_settings');
+            onSuccess(saved ? JSON.parse(saved) : null);
           } else if (funcName === 'saveSettings') {
-              localStorage.setItem('timetable_settings', JSON.stringify(args[0]));
-              onSuccess({ success: true });
+            localStorage.setItem('timetable_settings', JSON.stringify(args[0]));
+            onSuccess({ success: true });
           } else if (funcName === 'getYearlyData') {
-              const prefix = args[0];
-              const result = {};
-              for (let i = 0; i < localStorage.length; i++) {
-                  const key = localStorage.key(i);
-                  if (key && key.startsWith('timetable_' + prefix) || key === 'timetable_master' || key === 'timetable_masterA' || key === 'timetable_masterB') {
-                       const cleanKey = key.replace('timetable_', '');
-                       result[cleanKey] = JSON.parse(localStorage.getItem(key));
-                  }
+            const prefix = args[0];
+            const result = {};
+            for (let i = 0; i < localStorage.length; i++) {
+              const key = localStorage.key(i);
+              if (key && key.startsWith('timetable_' + prefix) || key === 'timetable_master' || key === 'timetable_masterA' || key === 'timetable_masterB') {
+                const cleanKey = key.replace('timetable_', '');
+                result[cleanKey] = JSON.parse(localStorage.getItem(key));
               }
-              onSuccess(result);
+            }
+            onSuccess(result);
           } else if (funcName === 'getCalendarEventsForWeek') {
-              onSuccess({
-                  success: true,
-                  data: {
-                      '月': ['10:00 出張', '15:00 会議'],
-                      '水': ['終日 遠足'],
-                      '金': ['16:00 研修']
-                  }
-              });
+            onSuccess({
+              success: true,
+              data: {
+                '月': ['10:00 出張', '15:00 会議'],
+                '水': ['終日 遠足'],
+                '金': ['16:00 研修']
+              }
+            });
           }
         }, 300);
       };
 
       const fetchWeekDataPromise = (weekId) => {
         return new Promise((resolve) => {
-            runGAS('loadData', [weekId], 
-                (data) => resolve(data ? migrateData(data) : null),
-                () => resolve(null)
-            );
+          runGAS('loadData', [weekId],
+            (data) => resolve(data ? migrateData(data) : null),
+            () => resolve(null)
+          );
         });
       };
 
       // 初期ロード（修正版：1回で完了）
       useEffect(() => {
         setLoading(true);
-        
+
         const today = new Date().toISOString().split('T')[0];
-        
+
         runGAS('getInitialData', [today], (result) => {
           // 1. 設定の復元
           if (result.settings) {
@@ -552,7 +606,7 @@
             if (result.settings.assignedGrade) setAssignedGrade(result.settings.assignedGrade);
             if (result.settings.calendarId) setCalendarId(result.settings.calendarId); // ★カレンダーID復元
           }
-          
+
           // 2. masterAの復元（なければ旧masterを使用）
           let initialA = null;
           if (result.masterA) {
@@ -563,17 +617,17 @@
             initialA = migrateData(null);
           }
           setMasterDataA(initialA);
-          
+
           // 3. masterBの復元
           const initialB = migrateData(result.masterB);
           setMasterDataB(initialB);
-          
+
           // 4. 週データの復元
           const syncedData = migrateData(result.currentWeek);
           setWeeklyData(syncedData);
           setHistory([JSON.stringify(syncedData)]);
           setHistoryIndex(0);
-          
+
           // 5. ローディング解除
           setLoading(false);
         }, (error) => {
@@ -587,10 +641,10 @@
         if (!schoolStartDate || loading) return;
         const weekId = getWeekId(currentDate, schoolStartDate);
         runGAS('loadData', [weekId], (data) => {
-            const syncedData = migrateData(data);
-            setWeeklyData(syncedData);
-            setHistory([JSON.stringify(syncedData)]);
-            setHistoryIndex(0);
+          const syncedData = migrateData(data);
+          setWeeklyData(syncedData);
+          setHistory([JSON.stringify(syncedData)]);
+          setHistoryIndex(0);
         });
       }, [currentDate, schoolStartDate]);
 
@@ -600,7 +654,7 @@
           const activeBtn = scrollRef.current.querySelector(`[data-week="${weekNo}"]`);
           if (activeBtn) {
             setTimeout(() => {
-                activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+              activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
             }, 100);
           }
         }
@@ -611,7 +665,7 @@
         if (historyIndex >= 0 && history[historyIndex] === json) return;
         const nextHistory = history.slice(0, historyIndex + 1);
         nextHistory.push(json);
-        if (nextHistory.length > 30) nextHistory.shift(); 
+        if (nextHistory.length > 30) nextHistory.shift();
         setHistory(nextHistory);
         setHistoryIndex(nextHistory.length - 1);
       };
@@ -620,40 +674,40 @@
       const redo = () => { if (historyIndex < history.length - 1) { const next = JSON.parse(history[historyIndex + 1]); setWeeklyData(next); setHistoryIndex(historyIndex + 1); showNotification("やり直しました"); } };
 
       const showNotification = (msg) => { setNotification(msg); setTimeout(() => setNotification(null), 3000); };
-      
-      const handleSaveSettings = () => { 
+
+      const handleSaveSettings = () => {
         const val = document.getElementById('settings-start-date').value;
         const grade = document.getElementById('settings-grade').value;
         const calId = document.getElementById('settings-calendar-id').value; // ★カレンダーID取得
-        if (!val) return; 
+        if (!val) return;
         setSchoolStartDate(new Date(val));
         setAssignedGrade(grade);
         setCalendarId(calId);
-        runGAS('saveSettings', [{ startDate: val, assignedGrade: grade, calendarId: calId }], () => { 
-          showNotification("設定を保存しました"); 
-          setIsSettingsOpen(false); 
-        }); 
+        runGAS('saveSettings', [{ startDate: val, assignedGrade: grade, calendarId: calId }], () => {
+          showNotification("設定を保存しました");
+          setIsSettingsOpen(false);
+        });
       };
-      
+
       const handleChange = (day, index, field, value) => {
         let target, setTarget;
         if (activeTab === 'master') {
-            target = fixedTab === 'A' ? masterDataA : masterDataB;
-            setTarget = fixedTab === 'A' ? setMasterDataA : setMasterDataB;
+          target = fixedTab === 'A' ? masterDataA : masterDataB;
+          setTarget = fixedTab === 'A' ? setMasterDataA : setMasterDataB;
         } else {
-            target = weeklyData;
-            setTarget = setWeeklyData;
+          target = weeklyData;
+          setTarget = setWeeklyData;
         }
-        
+
         const newData = { ...target };
         if (index === 'memo') newData[day] = { ...newData[day], memo: value };
         else if (index === 'break') {
-            if (!newData[day].breaks) newData[day].breaks = { lunch: true, noon_break: true, cleaning: true };
-            newData[day].breaks = { ...newData[day].breaks, [field]: !newData[day].breaks[field] };
+          if (!newData[day].breaks) newData[day].breaks = { lunch: true, noon_break: true, cleaning: true };
+          newData[day].breaks = { ...newData[day].breaks, [field]: !newData[day].breaks[field] };
         } else {
-            const newClasses = [...newData[day].classes];
-            newClasses[index] = { ...newClasses[index], [field]: value };
-            newData[day].classes = newClasses;
+          const newClasses = [...newData[day].classes];
+          newClasses[index] = { ...newClasses[index], [field]: value };
+          newData[day].classes = newClasses;
         }
         setTarget(newData);
         if (activeTab === 'weekly') saveToHistory(newData);
@@ -665,17 +719,17 @@
       const handleWeeklyMemoChange = (d, v) => handleChange(d, 'memo', null, v);
       const handleMasterBreakToggle = (d, id) => handleChange(d, 'break', id, null);
       const handleWeeklyBreakToggle = (d, id) => handleChange(d, 'break', id, null);
-      
+
       const saveMaster = () => {
         setSaving(true);
         const key = fixedTab === 'A' ? 'masterA' : 'masterB';
         const data = fixedTab === 'A' ? masterDataA : masterDataB;
         runGAS('saveData', [key, data], () => { setSaving(false); showNotification(`固定【パターン${fixedTab}】を保存しました`); });
       };
-      
+
       const saveCurrentWeek = () => { const weekId = getWeekId(currentDate, schoolStartDate); setSaving(true); runGAS('saveData', [weekId, weeklyData], () => { setSaving(false); showNotification("週の予定を保存しました"); }); };
       const changeWeek = (offset) => { const newDate = new Date(currentDate); newDate.setDate(newDate.getDate() + (offset * 7)); setCurrentDate(newDate); };
-      
+
       const applyMaster = (type) => {
         const sourceData = type === 'A' ? masterDataA : masterDataB;
         const weekId = getWeekId(currentDate, schoolStartDate);
@@ -692,7 +746,7 @@
         setSaving(true);
         runGAS('saveData', [weekId, newWeeklyData], () => { setSaving(false); setApplyModalOpen(false); showNotification(`固定【パターン${type}】を反映しました`); });
       };
-      
+
       const clearWeek = () => {
         setConfirmModal({
           isOpen: true, message: "白紙に戻しますか？",
@@ -715,65 +769,65 @@
         const yearPrefix = `SY${startYear}`;
         const endWeekNo = getSchoolWeekNumber(currentDate, schoolStartDate);
         runGAS('getYearlyData', [yearPrefix], (allData) => {
-            const counts = {};
-            for (let i = 1; i <= endWeekNo; i++) {
-                const weekId = `${yearPrefix}-W${('00' + i).slice(-2)}`;
-                const weekData = allData[weekId];
-                if (weekData) {
-                    const data = migrateData(weekData); 
-                    DAYS.forEach(day => {
-                        if (data[day] && data[day].classes) {
-                            data[day].classes.forEach(cls => {
-                                const sub = cls.subject ? cls.subject.trim() : '';
-                                if (sub) {
-                                    const normalized = normalizeSubject(sub, assignedGrade);
-                                    counts[normalized] = (counts[normalized] || 0) + 1;
-                                }
-                            });
-                        }
-                    });
+          const counts = {};
+          for (let i = 1; i <= endWeekNo; i++) {
+            const weekId = `${yearPrefix}-W${('00' + i).slice(-2)}`;
+            const weekData = allData[weekId];
+            if (weekData) {
+              const data = migrateData(weekData);
+              DAYS.forEach(day => {
+                if (data[day] && data[day].classes) {
+                  data[day].classes.forEach(cls => {
+                    const sub = cls.subject ? cls.subject.trim() : '';
+                    if (sub) {
+                      const normalized = normalizeSubject(sub, assignedGrade);
+                      counts[normalized] = (counts[normalized] || 0) + 1;
+                    }
+                  });
                 }
+              });
             }
-            setTotalStats(counts);
-            setShowTotalModal(true);
-            setIsCalculating(false);
+          }
+          setTotalStats(counts);
+          setShowTotalModal(true);
+          setIsCalculating(false);
         }, (error) => {
-            console.error(error);
-            showNotification("集計に失敗しました");
-            setIsCalculating(false);
+          console.error(error);
+          showNotification("集計に失敗しました");
+          setIsCalculating(false);
         });
       };
-      
+
       // ★ カレンダー取込処理
       const handleImportFromCalendar = () => {
         const { monday } = getWeekRange(currentDate);
         const mondayStr = monday.toISOString().split('T')[0];
-        
+
         // ローディング表示（簡易）
         setSaving(true);
-        
+
         runGAS('getCalendarEventsForWeek', [calendarId, mondayStr], (res) => {
           setSaving(false);
           if (res.error) {
-             alert(res.error);
-             return;
+            alert(res.error);
+            return;
           }
           if (res.success && res.data) {
-             const newWeeklyData = { ...weeklyData };
-             let count = 0;
-             DAYS.forEach(day => {
-               const events = res.data[day];
-               if (events && events.length > 0) {
-                 const currentMemo = newWeeklyData[day].memo || '';
-                 const appendText = events.join('\n');
-                 // 追記（既に文字があれば改行を入れる）
-                 newWeeklyData[day].memo = currentMemo ? `${currentMemo}\n${appendText}` : appendText;
-                 count += events.length;
-               }
-             });
-             setWeeklyData(newWeeklyData);
-             saveToHistory(newWeeklyData);
-             showNotification(`${count}件の予定を取り込みました`);
+            const newWeeklyData = { ...weeklyData };
+            let count = 0;
+            DAYS.forEach(day => {
+              const events = res.data[day];
+              if (events && events.length > 0) {
+                const currentMemo = newWeeklyData[day].memo || '';
+                const appendText = events.join('\n');
+                // 追記（既に文字があれば改行を入れる）
+                newWeeklyData[day].memo = currentMemo ? `${currentMemo}\n${appendText}` : appendText;
+                count += events.length;
+              }
+            });
+            setWeeklyData(newWeeklyData);
+            saveToHistory(newWeeklyData);
+            showNotification(`${count}件の予定を取り込みました`);
           }
         }, (err) => {
           setSaving(false);
@@ -788,7 +842,7 @@
       const weekDates = getWeekDates(weekLabelData.monday);
       const weekNo = getSchoolWeekNumber(currentDate, schoolStartDate);
       const schoolWeeks = getSchoolYearWeeks(schoolStartDate);
-      
+
       if (loading || !masterDataA || !masterDataB || !weeklyData) return <div className="h-screen w-full flex items-center justify-center text-gray-500 gap-2 bg-gray-50"><div className="spinner"></div>読み込み中...</div>;
 
       return (
@@ -798,8 +852,8 @@
               <div className="flex items-center gap-2"><div className="bg-blue-600 p-2 rounded-lg text-white"><Icons.BookOpen /></div><h1 className="font-bold text-lg text-gray-800">小学校 時間割</h1></div>
               <div className="flex items-center gap-2">
                 <nav className="flex bg-gray-100 p-1 rounded-lg">
-                    <button onClick={() => setActiveTab('weekly')} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${activeTab === 'weekly' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500'}`}>週の予定</button>
-                    <button onClick={() => setActiveTab('master')} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${activeTab === 'master' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500'}`}>固定時間割</button>
+                  <button onClick={() => setActiveTab('weekly')} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${activeTab === 'weekly' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500'}`}>週の予定</button>
+                  <button onClick={() => setActiveTab('master')} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${activeTab === 'master' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500'}`}>固定時間割</button>
                 </nav>
                 <button onClick={() => setIsSettingsOpen(true)} className="p-2 text-gray-500 hover:bg-gray-100 rounded-full transition-colors"><Icons.Settings /></button>
               </div>
@@ -808,12 +862,12 @@
 
           <main className="max-w-7xl mx-auto px-2 py-4 w-full">
             {activeTab === 'master' && (
-                <div className="flex justify-center mb-4 no-print">
-                    <div className="flex bg-gray-100 p-1 rounded-lg border border-gray-200">
-                        <button onClick={() => setFixedTab('A')} className={`px-6 py-2 rounded-md text-sm font-bold transition-all ${fixedTab === 'A' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>パターン A</button>
-                        <button onClick={() => setFixedTab('B')} className={`px-6 py-2 rounded-md text-sm font-bold transition-all ${fixedTab === 'B' ? 'bg-white text-green-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>パターン B</button>
-                    </div>
+              <div className="flex justify-center mb-4 no-print">
+                <div className="flex bg-gray-100 p-1 rounded-lg border border-gray-200">
+                  <button onClick={() => setFixedTab('A')} className={`px-6 py-2 rounded-md text-sm font-bold transition-all ${fixedTab === 'A' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>パターン A</button>
+                  <button onClick={() => setFixedTab('B')} className={`px-6 py-2 rounded-md text-sm font-bold transition-all ${fixedTab === 'B' ? 'bg-white text-green-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>パターン B</button>
                 </div>
+              </div>
             )}
 
             <div className="print-container overflow-x-auto bg-white rounded-xl shadow-sm border border-gray-200">
@@ -828,7 +882,7 @@
                   <div className="h-10 flex items-center justify-center font-bold text-gray-400 text-xs print-header-cell">時限</div>
                   {weekDates.map((d, i) => (
                     <div key={i} className="h-10 bg-gray-50 rounded-lg flex flex-col items-center justify-center font-bold text-gray-700 print-header-cell leading-tight">
-                        <span className="text-[10px] text-gray-500 font-normal print:text-black print:text-[10px]">{d.date}</span><span>{d.day}</span>
+                      <span className="text-[10px] text-gray-500 font-normal print:text-black print:text-[10px]">{d.date}</span><span>{d.day}</span>
                     </div>
                   ))}
                   {SCHEDULE_ROWS.map((row) => (
@@ -836,10 +890,10 @@
                       <div className={`${row.height || 'h-24 md:h-28'} print-cell-h flex flex-col items-center justify-center bg-gray-50 rounded-lg text-gray-500 ${row.type === 'class' ? 'print-class-cell' : 'print-break-cell'} print-time-col`}><span className="text-sm font-bold text-gray-700">{row.label}</span></div>
                       {DAYS.map(day => {
                         if (row.type === 'class') {
-                            return <div key={`${day}-${row.id}`} className={`${row.height || 'h-24 md:h-28'} print-cell-h relative flex flex-col ${row.type === 'class' ? 'print-class-cell' : 'print-break-cell'}`}><TimetableCell day={day} periodIndex={row.dataIndex} data={currentSchedule[day].classes[row.dataIndex]} onChange={(d, idx, f, v) => handleChange(d, idx, f, v)} /></div>;
+                          return <div key={`${day}-${row.id}`} className={`${row.height || 'h-24 md:h-28'} print-cell-h relative flex flex-col ${row.type === 'class' ? 'print-class-cell' : 'print-break-cell'}`}><TimetableCell day={day} periodIndex={row.dataIndex} data={currentSchedule[day].classes[row.dataIndex]} onChange={(d, idx, f, v) => handleChange(d, idx, f, v)} /></div>;
                         } else {
-                            const isActive = currentSchedule[day].breaks ? currentSchedule[day].breaks[row.id] !== false : true;
-                            return <div key={`${day}-${row.id}`} onClick={() => handleChange(day, 'break', row.id, null)} className={`relative flex items-center justify-center h-full rounded-lg border border-slate-200 text-[10px] font-medium text-slate-500 print-break-cell cursor-pointer transition-colors hover:opacity-80 ${isActive ? 'bg-blue-50 text-blue-600' : 'diagonal-stripe print-diagonal'}`}>{isActive ? row.label : ''}</div>;
+                          const isActive = currentSchedule[day].breaks ? currentSchedule[day].breaks[row.id] !== false : true;
+                          return <div key={`${day}-${row.id}`} onClick={() => handleChange(day, 'break', row.id, null)} className={`relative flex items-center justify-center h-full rounded-lg border border-slate-200 text-[10px] font-medium text-slate-500 print-break-cell cursor-pointer transition-colors hover:opacity-80 ${isActive ? 'bg-blue-50 text-blue-600' : 'diagonal-stripe print-diagonal'}`}>{isActive ? row.label : ''}</div>;
                         }
                       })}
                     </React.Fragment>
@@ -853,38 +907,38 @@
                 <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
                   <div className="flex flex-col gap-4">
                     <div className="bg-gray-50 p-2 rounded-lg">
-                        <div className="flex items-center justify-between mb-2 px-1">
-                            <button onClick={() => changeWeek(-1)} className="p-1 hover:bg-white rounded-full text-gray-500"><Icons.ArrowLeft /></button>
-                            <span className="text-xs font-bold text-gray-500">週を選択</span>
-                            <button onClick={() => changeWeek(1)} className="p-1 hover:bg-white rounded-full text-gray-500"><Icons.ArrowRight /></button>
-                        </div>
-                        <div className="flex overflow-x-auto gap-2 pb-2 snap-x" ref={scrollRef}>
-                            {schoolWeeks.map(week => (
-                                <button key={week.no} data-week={week.no} onClick={() => setCurrentDate(week.start)} className={`flex-shrink-0 snap-center px-4 py-2 rounded-lg border text-center transition-all ${weekNo === week.no ? 'bg-blue-600 text-white border-blue-600 shadow-md transform scale-105' : 'bg-white text-gray-600 border-gray-200 hover:border-blue-300'}`}>
-                                    <div className="text-xs font-bold whitespace-nowrap">{week.label}</div>
-                                    <div className={`text-[10px] whitespace-nowrap ${weekNo === week.no ? 'text-blue-100' : 'text-gray-400'}`}>{week.dateRange}</div>
-                                </button>
-                            ))}
-                        </div>
+                      <div className="flex items-center justify-between mb-2 px-1">
+                        <button onClick={() => changeWeek(-1)} className="p-1 hover:bg-white rounded-full text-gray-500"><Icons.ArrowLeft /></button>
+                        <span className="text-xs font-bold text-gray-500">週を選択</span>
+                        <button onClick={() => changeWeek(1)} className="p-1 hover:bg-white rounded-full text-gray-500"><Icons.ArrowRight /></button>
+                      </div>
+                      <div className="flex overflow-x-auto gap-2 pb-2 snap-x" ref={scrollRef}>
+                        {schoolWeeks.map(week => (
+                          <button key={week.no} data-week={week.no} onClick={() => setCurrentDate(week.start)} className={`flex-shrink-0 snap-center px-4 py-2 rounded-lg border text-center transition-all ${weekNo === week.no ? 'bg-blue-600 text-white border-blue-600 shadow-md transform scale-105' : 'bg-white text-gray-600 border-gray-200 hover:border-blue-300'}`}>
+                            <div className="text-xs font-bold whitespace-nowrap">{week.label}</div>
+                            <div className={`text-[10px] whitespace-nowrap ${weekNo === week.no ? 'text-blue-100' : 'text-gray-400'}`}>{week.dateRange}</div>
+                          </button>
+                        ))}
+                      </div>
                     </div>
                     <div className="flex flex-wrap gap-2 justify-center">
                       <button onClick={handleImportFromCalendar} disabled={saving} className="flex items-center gap-2 px-3 py-2 text-xs font-bold text-gray-600 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg shadow-sm" title="Googleカレンダーから予定を取り込む">
                         <Icons.Download /> <span className="hidden sm:inline">カレンダー取込</span>
                       </button>
                       <button onClick={handleCalculateTotal} disabled={isCalculating} className="flex items-center gap-2 px-3 py-2 text-xs font-bold text-gray-600 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg shadow-sm">
-                        {isCalculating ? <div className="spinner w-3 h-3"></div> : <Icons.Calculator />} 
+                        {isCalculating ? <div className="spinner w-3 h-3"></div> : <Icons.Calculator />}
                         <span className="hidden sm:inline">累計確認</span>
                       </button>
                       <button onClick={handlePrint} className="flex items-center gap-2 px-3 py-2 text-xs font-bold text-gray-600 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg shadow-sm"><Icons.Printer /> <span className="hidden sm:inline">PDF/印刷</span></button>
                       <div className="flex items-center gap-2 flex-grow max-w-sm">
-                          <button onClick={undo} disabled={historyIndex <= 0} className="p-3 bg-gray-100 text-gray-600 rounded-lg disabled:opacity-30 active:bg-gray-200 transition-colors"><Icons.Undo /></button>
-                          <button onClick={saveCurrentWeek} disabled={saving} className="flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-bold text-white bg-green-600 hover:bg-green-700 rounded-lg shadow-md transition-all disabled:opacity-50"><Icons.Save /> {saving ? '保存中' : '保存'}</button>
-                          <button onClick={redo} disabled={historyIndex >= history.length - 1} className="p-3 bg-gray-100 text-gray-600 rounded-lg disabled:opacity-30 active:bg-gray-200 transition-colors"><Icons.Redo /></button>
+                        <button onClick={undo} disabled={historyIndex <= 0} className="p-3 bg-gray-100 text-gray-600 rounded-lg disabled:opacity-30 active:bg-gray-200 transition-colors"><Icons.Undo /></button>
+                        <button onClick={saveCurrentWeek} disabled={saving} className="flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-bold text-white bg-green-600 hover:bg-green-700 rounded-lg shadow-md transition-all disabled:opacity-50"><Icons.Save /> {saving ? '保存中' : '保存'}</button>
+                        <button onClick={redo} disabled={historyIndex >= history.length - 1} className="p-3 bg-gray-100 text-gray-600 rounded-lg disabled:opacity-30 active:bg-gray-200 transition-colors"><Icons.Redo /></button>
                       </div>
                     </div>
                     <div className="flex justify-center gap-2 border-t pt-3">
-                       <button onClick={clearWeek} className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg"><Icons.Eraser /> クリア</button>
-                       <button onClick={() => setApplyModalOpen(true)} className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm"><Icons.Copy /> 固定を反映</button>
+                      <button onClick={clearWeek} className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg"><Icons.Eraser /> クリア</button>
+                      <button onClick={() => setApplyModalOpen(true)} className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm"><Icons.Copy /> 固定を反映</button>
                     </div>
                   </div>
                 </div>
@@ -898,7 +952,7 @@
           </main>
 
           {notification && <div className="fixed bottom-6 right-6 bg-gray-900 text-white px-4 py-3 rounded-lg shadow-xl flex items-center gap-3 z-50 toast"><Icons.CheckCircle2 /><span className="font-medium text-sm">{notification}</span></div>}
-          
+
           {confirmModal.isOpen && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 modal-overlay">
               <div className="bg-white rounded-xl shadow-xl max-w-sm w-full p-6">
@@ -911,57 +965,57 @@
               </div>
             </div>
           )}
-          
+
           {/* ★ 累計結果モーダル（基準時数と比較） */}
           {showTotalModal && totalStats && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 modal-overlay">
               <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
                 <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-bold text-gray-800">{assignedGrade}年生 累計授業時数</h3>
-                    <div className="text-xs text-gray-500">第1週 〜 第{weekNo}週</div>
+                  <h3 className="text-lg font-bold text-gray-800">{assignedGrade}年生 累計授業時数</h3>
+                  <div className="text-xs text-gray-500">第1週 〜 第{weekNo}週</div>
                 </div>
                 <div className="max-h-96 overflow-y-auto mb-6">
-                    <div className="space-y-2">
+                  <div className="space-y-2">
                     {Object.entries(totalStats).sort((a, b) => {
-                        const standardA = STANDARD_HOURS[assignedGrade][a[0]] || 0;
-                        const standardB = STANDARD_HOURS[assignedGrade][b[0]] || 0;
-                        return standardB - standardA;
+                      const standardA = STANDARD_HOURS[assignedGrade][a[0]] || 0;
+                      const standardB = STANDARD_HOURS[assignedGrade][b[0]] || 0;
+                      return standardB - standardA;
                     }).map(([sub, count]) => {
-                        const standard = STANDARD_HOURS[assignedGrade][sub] || 0;
-                        const remaining = standard - count;
-                        const isComplete = remaining <= 0;
-                        return (
-                            <div key={sub} className="p-3 bg-gray-50 rounded-lg">
-                                <div className="flex justify-between items-center mb-1">
-                                    <span className={`font-bold px-2 py-0.5 rounded text-sm ${getSubjectStyle(sub)}`}>{sub}</span>
-                                    {standard > 0 && (
-                                        <span className={`text-xs font-bold ${isComplete ? 'text-green-600' : 'text-orange-600'}`}>
-                                            {isComplete ? '✓ 達成' : `あと${remaining}時間`}
-                                        </span>
-                                    )}
+                      const standard = STANDARD_HOURS[assignedGrade][sub] || 0;
+                      const remaining = standard - count;
+                      const isComplete = remaining <= 0;
+                      return (
+                        <div key={sub} className="p-3 bg-gray-50 rounded-lg">
+                          <div className="flex justify-between items-center mb-1">
+                            <span className={`font-bold px-2 py-0.5 rounded text-sm ${getSubjectStyle(sub)}`}>{sub}</span>
+                            {standard > 0 && (
+                              <span className={`text-xs font-bold ${isComplete ? 'text-green-600' : 'text-orange-600'}`}>
+                                {isComplete ? '✓ 達成' : `あと${remaining}時間`}
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2 text-sm">
+                            <span className="font-bold text-gray-700">{count}</span>
+                            {standard > 0 ? (
+                              <>
+                                <span className="text-gray-400">/</span>
+                                <span className="text-gray-600">{standard}時間</span>
+                                <div className="flex-1 bg-gray-200 rounded-full h-2 ml-2">
+                                  <div
+                                    className={`h-2 rounded-full transition-all ${isComplete ? 'bg-green-500' : 'bg-blue-500'}`}
+                                    style={{ width: `${Math.min(100, (count / standard) * 100)}%` }}
+                                  />
                                 </div>
-                                <div className="flex items-center gap-2 text-sm">
-                                    <span className="font-bold text-gray-700">{count}</span>
-                                    {standard > 0 ? (
-                                        <>
-                                            <span className="text-gray-400">/</span>
-                                            <span className="text-gray-600">{standard}時間</span>
-                                            <div className="flex-1 bg-gray-200 rounded-full h-2 ml-2">
-                                                <div 
-                                                    className={`h-2 rounded-full transition-all ${isComplete ? 'bg-green-500' : 'bg-blue-500'}`}
-                                                    style={{ width: `${Math.min(100, (count / standard) * 100)}%` }}
-                                                />
-                                            </div>
-                                        </>
-                                    ) : (
-                                        <span className="text-gray-400 text-xs">（基準時数なし）</span>
-                                    )}
-                                </div>
-                            </div>
-                        );
+                              </>
+                            ) : (
+                              <span className="text-gray-400 text-xs">（基準時数なし）</span>
+                            )}
+                          </div>
+                        </div>
+                      );
                     })}
                     {Object.keys(totalStats).length === 0 && <p className="text-center text-gray-400 py-4">データがありません</p>}
-                    </div>
+                  </div>
                 </div>
                 <button onClick={() => setShowTotalModal(false)} className="w-full py-3 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200">閉じる</button>
               </div>
@@ -972,10 +1026,10 @@
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 modal-overlay">
               <div className="bg-white rounded-xl shadow-xl max-w-sm w-full p-6 text-center">
                 <h3 className="text-lg font-bold text-gray-800 mb-2">固定時間割を反映</h3>
-                <p className="text-xs text-gray-500 mb-6">どちらのパターンをこの週にコピーしますか？<br/>(現在の入力内容は上書きされます)</p>
+                <p className="text-xs text-gray-500 mb-6">どちらのパターンをこの週にコピーしますか？<br />(現在の入力内容は上書きされます)</p>
                 <div className="grid grid-cols-2 gap-3 mb-4">
-                    <button onClick={() => applyMaster('A')} className="py-3 rounded-xl border-2 border-blue-100 bg-blue-50 text-blue-700 font-bold hover:bg-blue-100 transition-colors">パターン A</button>
-                    <button onClick={() => applyMaster('B')} className="py-3 rounded-xl border-2 border-green-100 bg-green-50 text-green-700 font-bold hover:bg-green-100 transition-colors">パターン B</button>
+                  <button onClick={() => applyMaster('A')} className="py-3 rounded-xl border-2 border-blue-100 bg-blue-50 text-blue-700 font-bold hover:bg-blue-100 transition-colors">パターン A</button>
+                  <button onClick={() => applyMaster('B')} className="py-3 rounded-xl border-2 border-green-100 bg-green-50 text-green-700 font-bold hover:bg-green-100 transition-colors">パターン B</button>
                 </div>
                 <button onClick={() => setApplyModalOpen(false)} className="w-full py-2 text-sm text-gray-400 hover:text-gray-600 underline">キャンセル</button>
               </div>
@@ -987,24 +1041,24 @@
               <div className="bg-white rounded-xl shadow-xl max-w-sm w-full p-6">
                 <div className="flex items-center gap-3 mb-4 text-gray-700"><Icons.Settings className="w-6 h-6" /><h3 className="text-lg font-bold">設定</h3></div>
                 <div className="mb-4">
-                    <label className="block text-sm font-bold text-gray-700 mb-2">年度開始日（第1週の月曜日）</label>
-                    <input type="date" defaultValue={schoolStartDate.toISOString().split('T')[0]} id="settings-start-date" className="w-full p-2 border border-gray-300 rounded-lg"/>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">年度開始日（第1週の月曜日）</label>
+                  <input type="date" defaultValue={schoolStartDate.toISOString().split('T')[0]} id="settings-start-date" className="w-full p-2 border border-gray-300 rounded-lg" />
                 </div>
                 <div className="mb-4">
-                    <label className="block text-sm font-bold text-gray-700 mb-2">担当学年</label>
-                    <select defaultValue={assignedGrade} id="settings-grade" className="w-full p-2 border border-gray-300 rounded-lg">
-                        <option value="1">1年生</option>
-                        <option value="2">2年生</option>
-                        <option value="3">3年生</option>
-                        <option value="4">4年生</option>
-                        <option value="5">5年生</option>
-                        <option value="6">6年生</option>
-                    </select>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">担当学年</label>
+                  <select defaultValue={assignedGrade} id="settings-grade" className="w-full p-2 border border-gray-300 rounded-lg">
+                    <option value="1">1年生</option>
+                    <option value="2">2年生</option>
+                    <option value="3">3年生</option>
+                    <option value="4">4年生</option>
+                    <option value="5">5年生</option>
+                    <option value="6">6年生</option>
+                  </select>
                 </div>
                 <div className="mb-6">
-                    <label className="block text-sm font-bold text-gray-700 mb-2">カレンダーID (任意)</label>
-                    <input type="text" defaultValue={calendarId} placeholder="空欄でデフォルトカレンダーを使用" id="settings-calendar-id" className="w-full p-2 border border-gray-300 rounded-lg text-sm"/>
-                    <p className="text-xs text-gray-400 mt-1">※Googleカレンダーの設定ページから確認できます</p>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">カレンダーID (任意)</label>
+                  <input type="text" defaultValue={calendarId} placeholder="空欄でデフォルトカレンダーを使用" id="settings-calendar-id" className="w-full p-2 border border-gray-300 rounded-lg text-sm" />
+                  <p className="text-xs text-gray-400 mt-1">※Googleカレンダーの設定ページから確認できます</p>
                 </div>
                 <div className="flex justify-end gap-3">
                   <button onClick={() => setIsSettingsOpen(false)} className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg">閉じる</button>
@@ -1021,4 +1075,5 @@
     root.render(<App />);
   </script>
 </body>
+
 </html>

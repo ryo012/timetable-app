@@ -212,7 +212,25 @@ function calculateWeekId(targetDateStr, startDateStr) {
 }
 
 function getSheet() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  // スタンドアロン型GAS対応：ScriptProperties にスプレッドシートIDを保存
+  const props = PropertiesService.getScriptProperties();
+  let ssId = props.getProperty('SPREADSHEET_ID');
+
+  let ss;
+  if (ssId) {
+    try {
+      ss = SpreadsheetApp.openById(ssId);
+    } catch (e) {
+      ssId = null; // IDが無効なら再作成
+    }
+  }
+
+  if (!ssId) {
+    // 初回：スプレッドシートを自動作成
+    ss = SpreadsheetApp.create('時間割マネージャー データ');
+    props.setProperty('SPREADSHEET_ID', ss.getId());
+  }
+
   let sheet = ss.getSheetByName('Database');
   if (!sheet) {
     sheet = ss.insertSheet('Database');

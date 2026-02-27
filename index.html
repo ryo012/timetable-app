@@ -596,58 +596,83 @@
         });
       };
 
-      // 初期ロード（修正版：1回で完了）
+      // ★ キャッシュヘルパー
+      const CACHE_PREFIX = 'swr_';
+      const saveCache = (key, value) => { try { localStorage.setItem(CACHE_PREFIX + key, JSON.stringify(value)); } catch (e) { } };
+      const loadCache = (key) => { try { const v = localStorage.getItem(CACHE_PREFIX + key); return v ? JSON.parse(v) : null; } catch (e) { return null; } };
+
+      // ★ initデータをstateに適用する共通関数
+      const applyInitialData = (result, fromCache) => {
+        if (result.settings) {
+          if (result.settings.startDate) setSchoolStartDate(new Date(result.settings.startDate));
+          if (result.settings.assignedGrade) setAssignedGrade(result.settings.assignedGrade);
+          if (result.settings.calendarId) setCalendarId(result.settings.calendarId);
+        }
+        let initialA = null;
+        if (result.masterA) initialA = migrateData(result.masterA);
+        else if (result.master) initialA = migrateData(result.master);
+        else initialA = migrateData(null);
+        setMasterDataA(initialA);
+        setMasterDataB(migrateData(result.masterB));
+        const syncedData = migrateData(result.currentWeek);
+        setWeeklyData(syncedData);
+        setHistory([JSON.stringify(syncedData)]);
+        setHistoryIndex(0);
+      };
+
+      // 初期ロード（Stale-While-Revalidate版）
       useEffect(() => {
         setLoading(true);
-
         const today = new Date().toISOString().split('T')[0];
 
-        runGAS('getInitialData', [today], (result) => {
-          // 1. 設定の復元
-          if (result.settings) {
-            if (result.settings.startDate) setSchoolStartDate(new Date(result.settings.startDate));
-            if (result.settings.assignedGrade) setAssignedGrade(result.settings.assignedGrade);
-            if (result.settings.calendarId) setCalendarId(result.settings.calendarId); // ★カレンダーID復元
-          }
-
-          // 2. masterAの復元（なければ旧masterを使用）
-          let initialA = null;
-          if (result.masterA) {
-            initialA = migrateData(result.masterA);
-          } else if (result.master) {
-            initialA = migrateData(result.master);
-          } else {
-            initialA = migrateData(null);
-          }
-          setMasterDataA(initialA);
-
-          // 3. masterBの復元
-          const initialB = migrateData(result.masterB);
-          setMasterDataB(initialB);
-
-          // 4. 週データの復元
-          const syncedData = migrateData(result.currentWeek);
-          setWeeklyData(syncedData);
-          setHistory([JSON.stringify(syncedData)]);
-          setHistoryIndex(0);
-
-          // 5. ローディング解除
+        // ① キャッシュがあれば即座に表示（ローディング解除）
+        const cached = loadCache('initialData');
+        if (cached) {
+          applyInitialData(cached, true);
           setLoading(false);
-        }, (error) => {
-          console.error('初期データ読み込みエラー:', error);
-          alert('データの読み込みに失敗しました。ページを再読み込みしてください。');
-          setLoading(false);
-        });
+          // ② バックグラウンドでGASから最新データを取得して静かに更新
+          runGAS('getInitialData', [today], (result) => {
+            saveCache('initialData', result);
+            applyInitialData(result, false);
+          }, (err) => {
+            console.warn('[SWR] バックグラウンド更新失敗（キャッシュ表示中）:', err);
+          });
+        } else {
+          // キャッシュなし → GASから取得（初回のみ待ち時間あり）
+          runGAS('getInitialData', [today], (result) => {
+            saveCache('initialData', result);
+            applyInitialData(result, false);
+            setLoading(false);
+          }, (error) => {
+            console.error('初期データ読み込みエラー:', error);
+            alert('データの読み込みに失敗しました。ページを再読み込みしてください。');
+            setLoading(false);
+          });
+        }
       }, []);
 
       useEffect(() => {
         if (!schoolStartDate || loading) return;
         const weekId = getWeekId(currentDate, schoolStartDate);
+
+        // ① キャッシュがあれば即座に表示
+        const cached = loadCache(`week_${weekId}`);
+        if (cached) {
+          const cachedData = migrateData(cached);
+          setWeeklyData(cachedData);
+          setHistory([JSON.stringify(cachedData)]);
+          setHistoryIndex(0);
+        }
+
+        // ② バックグラウンドでGASから最新週データを取得
         runGAS('loadData', [weekId], (data) => {
           const syncedData = migrateData(data);
+          saveCache(`week_${weekId}`, syncedData);
           setWeeklyData(syncedData);
-          setHistory([JSON.stringify(syncedData)]);
-          setHistoryIndex(0);
+          if (!cached) {
+            setHistory([JSON.stringify(syncedData)]);
+            setHistoryIndex(0);
+          }
         });
       }, [currentDate, schoolStartDate]);
 
@@ -1076,6 +1101,17 @@
 
     const root = ReactDOM.createRoot(document.getElementById('root'));
     root.render(<App />);
+  </script>
+
+  <script>
+    // Service Worker 登録（ブラウザキャッシュでアプリシェルを高速化）
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/timetable-app/sw.js', { scope: '/timetable-app/' })
+          .then(reg => console.log('[SW] 登録完了:', reg.scope))
+          .catch(err => console.warn('[SW] 登録失敗:', err));
+      });
+    }
   </script>
 </body>
 

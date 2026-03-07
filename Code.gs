@@ -226,7 +226,18 @@ function getSheet() {
   }
 
   if (!ssId) {
-    // 初回：スプレッドシートを自動作成
+    // 1. まずコンテナバインド（既存シート紐付け）かどうか確認
+    try {
+      ss = SpreadsheetApp.getActiveSpreadsheet();
+      if (ss) {
+        ssId = ss.getId();
+        props.setProperty('SPREADSHEET_ID', ssId);
+      }
+    } catch (e) {}
+  }
+
+  if (!ss) {
+    // 2. 紐付けシートがない場合は新規自動作成
     ss = SpreadsheetApp.create('時間割マネージャー データ');
     props.setProperty('SPREADSHEET_ID', ss.getId());
   }

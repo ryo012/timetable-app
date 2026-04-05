@@ -322,7 +322,8 @@
       '火': { classes: Array(CLASS_COUNT).fill({ subject: '', detail: '' }), memo: '', breaks: { lunch: true, noon_break: true, cleaning: true } },
       '水': { classes: Array(CLASS_COUNT).fill({ subject: '', detail: '' }), memo: '', breaks: { lunch: true, noon_break: true, cleaning: true } },
       '木': { classes: Array(CLASS_COUNT).fill({ subject: '', detail: '' }), memo: '', breaks: { lunch: true, noon_break: true, cleaning: true } },
-      '金': { classes: Array(CLASS_COUNT).fill({ subject: '', detail: '' }), memo: '', breaks: { lunch: true, noon_break: true, cleaning: true } }
+      '金': { classes: Array(CLASS_COUNT).fill({ subject: '', detail: '' }), memo: '', breaks: { lunch: true, noon_break: true, cleaning: true } },
+      '特': { classes: Array(CLASS_COUNT).fill({ subject: '', detail: '' }), memo: '', breaks: { lunch: true, noon_break: true, cleaning: true } }
     };
 
     const SUBJECT_COLORS = {
@@ -415,7 +416,7 @@
     const migrateData = (data) => {
       if (!data) return JSON.parse(JSON.stringify(EMPTY_SCHEDULE));
       const newData = { ...data };
-      DAYS.forEach(d => {
+      [...DAYS, '特'].forEach(d => {
         if (!newData[d]) {
           newData[d] = JSON.parse(JSON.stringify(EMPTY_SCHEDULE['月']));
         } else {
@@ -581,6 +582,9 @@
       const [totalStats, setTotalStats] = useState(null);
       const [isCalculating, setIsCalculating] = useState(false);
       const [showTotalModal, setShowTotalModal] = useState(false);
+      
+      const [showExtraDay, setShowExtraDay] = useState(false);
+      const displayDays = showExtraDay ? [...DAYS, '特'] : DAYS;
 
       const scrollRef = useRef(null);
       const [history, setHistory] = useState([]);
@@ -863,11 +867,11 @@
         const sourceData = type === 'A' ? masterDataA : masterDataB;
         const weekId = getWeekId(currentDate, schoolStartDate);
         const newWeeklyData = { ...weeklyData };
-        DAYS.forEach(day => {
+        [...DAYS, '特'].forEach(day => {
           newWeeklyData[day] = {
             ...newWeeklyData[day],
-            classes: JSON.parse(JSON.stringify(sourceData[day].classes)),
-            breaks: JSON.parse(JSON.stringify(sourceData[day].breaks || { lunch: true, noon_break: true, cleaning: true }))
+            classes: JSON.parse(JSON.stringify(sourceData[day]?.classes || EMPTY_SCHEDULE['特'].classes)),
+            breaks: JSON.parse(JSON.stringify(sourceData[day]?.breaks || EMPTY_SCHEDULE['特'].breaks))
           };
         });
         setWeeklyData(newWeeklyData);
@@ -999,29 +1003,39 @@
               </div>
             )}
 
-            <div className="print-container overflow-x-auto bg-white rounded-xl shadow-sm border border-gray-200">
+            <div className="print-container overflow-x-auto bg-white rounded-xl shadow-sm border border-gray-200 relative">
+              <div className="absolute right-0 top-0 mt-2 mr-2 no-print z-10">
+                <button onClick={() => setShowExtraDay(!showExtraDay)} className="w-6 h-6 flex items-center justify-center font-bold text-gray-400 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors text-xs opacity-50 hover:opacity-100">
+                  {showExtraDay ? '−' : '＋'}
+                </button>
+              </div>
               <div className="print-scroll-view min-w-[800px] p-4">
-                <div className="grid grid-cols-[2.5rem_repeat(5,1fr)] gap-2">
+                <div className={`grid ${showExtraDay ? 'grid-cols-[2.5rem_repeat(6,1fr)]' : 'grid-cols-[2.5rem_repeat(5,1fr)]'} gap-2`}>
                   <div className="h-20 flex flex-col items-center justify-center bg-gray-100 rounded-lg text-gray-500 font-bold text-xs no-print">メモ</div>
-                  {DAYS.map(day => (
+                  {displayDays.map(day => (
                     <div key={`memo-${day}`} className="h-20 no-print">
-                      <textarea value={currentSchedule[day].memo} readOnly={activeTab === 'master'} onChange={(e) => activeTab === 'master' ? null : handleWeeklyMemoChange(day, e.target.value)} className={`w-full h-full p-2 text-xs border rounded-md resize-none outline-none focus:ring-2 focus:ring-blue-400 ${activeTab === 'master' ? 'bg-gray-100' : 'bg-white'}`} placeholder={activeTab === 'master' ? "固定メモ無効" : "メモ..."} />
+                      <textarea value={currentSchedule[day]?.memo || ''} readOnly={activeTab === 'master'} onChange={(e) => activeTab === 'master' ? null : handleWeeklyMemoChange(day, e.target.value)} className={`w-full h-full p-2 text-xs border rounded-md resize-none outline-none focus:ring-2 focus:ring-blue-400 ${activeTab === 'master' ? 'bg-gray-100' : 'bg-white'}`} placeholder={activeTab === 'master' ? "固定メモ無効" : "メモ..."} />
                     </div>
                   ))}
                   <div className="h-10 flex items-center justify-center font-bold text-gray-400 text-xs print-header-cell">時限</div>
                   {weekDates.map((d, i) => (
-                    <div key={i} className="h-10 bg-gray-50 rounded-lg flex flex-col items-center justify-center font-bold text-gray-700 print-header-cell leading-tight">
+                    <div key={i} className="h-10 bg-gray-50 rounded-lg flex flex-col items-center justify-center font-bold text-gray-700 print-header-cell leading-tight relative">
                       <span className="text-[10px] text-gray-500 font-normal print:text-black print:text-[10px]">{d.date}</span><span>{d.day}</span>
                     </div>
                   ))}
+                  {showExtraDay && (
+                    <div className="h-10 bg-blue-50 rounded-lg flex flex-col items-center justify-center font-bold text-blue-700 print-header-cell leading-tight border border-blue-100">
+                      <span className="text-[10px] text-blue-500 font-normal">特別</span><span>行事枠</span>
+                    </div>
+                  )}
                   {SCHEDULE_ROWS.map((row) => (
                     <React.Fragment key={row.id}>
                       <div className={`${row.height || 'h-24 md:h-28'} print-cell-h flex flex-col items-center justify-center bg-gray-50 rounded-lg text-gray-500 ${row.type === 'class' ? 'print-class-cell' : 'print-break-cell'} print-time-col`}><span className="text-sm font-bold text-gray-700">{row.label}</span></div>
-                      {DAYS.map(day => {
+                      {displayDays.map(day => {
                         if (row.type === 'class') {
-                          return <div key={`${day}-${row.id}`} className={`${row.height || 'h-24 md:h-28'} print-cell-h relative flex flex-col ${row.type === 'class' ? 'print-class-cell' : 'print-break-cell'}`}><TimetableCell day={day} periodIndex={row.dataIndex} data={currentSchedule[day].classes[row.dataIndex]} onChange={(d, idx, f, v) => handleChange(d, idx, f, v)} /></div>;
+                          return <div key={`${day}-${row.id}`} className={`${row.height || 'h-24 md:h-28'} print-cell-h relative flex flex-col ${row.type === 'class' ? 'print-class-cell' : 'print-break-cell'}`}><TimetableCell day={day} periodIndex={row.dataIndex} data={currentSchedule[day]?.classes[row.dataIndex]} onChange={(d, idx, f, v) => handleChange(d, idx, f, v)} /></div>;
                         } else {
-                          const isActive = currentSchedule[day].breaks ? currentSchedule[day].breaks[row.id] !== false : true;
+                          const isActive = currentSchedule[day]?.breaks ? currentSchedule[day].breaks[row.id] !== false : true;
                           return <div key={`${day}-${row.id}`} onClick={() => handleChange(day, 'break', row.id, null)} className={`relative flex items-center justify-center h-full rounded-lg border border-slate-200 text-[10px] font-medium text-slate-500 print-break-cell cursor-pointer transition-colors hover:opacity-80 ${isActive ? 'bg-blue-50 text-blue-600' : 'diagonal-stripe print-diagonal'}`}>{isActive ? row.label : ''}</div>;
                         }
                       })}
